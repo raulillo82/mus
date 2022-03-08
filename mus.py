@@ -26,6 +26,7 @@ POINTS_TO_WIN = 40
 
 CANVAS_WIDTH = 1000
 CANVAS_HEIGHT = 800
+CONTROL_PANEL_WIDTH = 85
 TEXT_HOR_MARGIN = 100
 TEXT_BORDER_MARGIN = 40
 TEXT_SIZE = 30
@@ -991,7 +992,8 @@ card_height = _image_height / len(SUITS)
                       
 frame = simplegui.create_frame('Mus',
                                CANVAS_WIDTH,
-                               CANVAS_HEIGHT)
+                               CANVAS_HEIGHT,
+                               CONTROL_PANEL_WIDTH)
 frame.set_canvas_background('Blue')
 button1 = frame.add_button('New game',
                            new_button_handler)
