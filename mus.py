@@ -27,8 +27,8 @@ POINTS_TO_WIN = 40
 CANVAS_WIDTH = 1000
 CANVAS_HEIGHT = 800
 CONTROL_PANEL_WIDTH = 85
-TEXT_HOR_MARGIN = 100
-TEXT_BORDER_MARGIN = 40
+TEXT_HOR_MARGIN = 150
+TEXT_BORDER_MARGIN = 10
 TEXT_SIZE = 30
 
 class MusGame:
@@ -899,16 +899,16 @@ def draw_handler(canvas):
                       (CANVAS_WIDTH, CANVAS_HEIGHT))'''
     #Static texts with the names of the players
     canvas.draw_text('Player 1',
-                     (CANVAS_WIDTH / 2 - 30,
-                      TEXT_BORDER_MARGIN),
+                     ((CANVAS_WIDTH - CONTROL_PANEL_WIDTH) / 2,
+                      TEXT_BORDER_MARGIN + TEXT_SIZE),
                      TEXT_SIZE, 'Black')
     canvas.draw_text('Player 2',
                      (CANVAS_WIDTH - TEXT_HOR_MARGIN,
                       CANVAS_HEIGHT / 2),
                      TEXT_SIZE, 'Black')
     canvas.draw_text('Player 3',
-                     (CANVAS_WIDTH / 2 - 30,
-                      CANVAS_HEIGHT - TEXT_BORDER_MARGIN),
+                     ((CANVAS_WIDTH - CONTROL_PANEL_WIDTH) / 2,
+                      CANVAS_HEIGHT - TEXT_SIZE),
                      TEXT_SIZE, 'Black')
     canvas.draw_text('Player 4',
                      (TEXT_BORDER_MARGIN,
@@ -932,7 +932,7 @@ def draw_handler(canvas):
                      TEXT_SIZE, 'Black')
     #"Mano" text on the top right corner
     canvas.draw_text(game.get_mano_text(),
-                     (CANVAS_WIDTH - 250,
+                     (CANVAS_WIDTH - 300,
                       50), TEXT_SIZE, 'Black')
     #Cards of each player
     player = 0
@@ -952,7 +952,7 @@ def draw_handler(canvas):
                         CANVAS_HEIGHT - TEXT_BORDER_MARGIN - card_height]
             incr_vector = (card_width, 0)
         elif player == 3:
-            card_pos = [TEXT_BORDER_MARGIN + 2 * card_width,
+            card_pos = [TEXT_HOR_MARGIN + card_width,
                         CANVAS_HEIGHT / 2 - 1.5 * card_height]
             incr_vector = (0, card_width)
         for card in hand.get_cards():
