@@ -150,7 +150,7 @@ class MusGame:
                 winner_grande = next_player        
             next_player += 1
             #print (winner_grande)
-        self.set_info_text("Gana grande: player " + str(winner_grande + 1))
+        self.set_info_text("Player " + str(winner_grande + 1) + " wins 'Biggest'")
         self.increment_score(1, winner_grande % 2)
         #print (self)
     
@@ -165,7 +165,7 @@ class MusGame:
                 winner_pequenya = next_player        
             next_player += 1
             #print (winner_pequenya)
-        self.set_info_text("Gana pequenya: player " + str(winner_pequenya + 1))
+        self.set_info_text("Player " + str(winner_pequenya + 1) + " wins 'Smallest'")
         self.increment_score(1, winner_pequenya % 2)
         #print (self)
     
@@ -184,7 +184,7 @@ class MusGame:
         if (len(players_with_pairs) < 1):# or
             #(len(players_with_pairs) == 2 and
              #players_with_pairs[1] - players_with_pairs[0] != 2)):
-            self.set_info_text("Nadie tiene pares")
+            self.set_info_text("Nobody has 'pairs'")
         else:
             #Only play for more than 1 player
             if (len(players_with_pairs) > 1):
@@ -202,7 +202,7 @@ class MusGame:
             else:
                 winner_pairs = players_with_pairs.pop(0)
             
-            self.set_info_text("Gana pares: player " + str(winner_pairs + 1))
+            self.set_info_text("Player " + str(winner_pairs + 1) + " wins 'Pairs'")
             
             #Count the points according to winner's kind of pairs
             self.increment_score(len(self.hands[winner_pairs].get_pairs()) - 1,
@@ -249,7 +249,7 @@ class MusGame:
         #as we already check this in play_juego_punto
         #It's kind of legacy before that other method was created
         if (len(players_with_juego) < 1):# or
-            self.set_info_text("Nadie tiene juego")
+            self.set_info_text("Nobody has 'Game'")
             #(len(players_with_juego) == 2 and
             # players_with_juego[1] - players_with_juego[0] != 2)):
         else:
@@ -270,7 +270,7 @@ class MusGame:
             else:
                 winner_juego = players_with_juego.pop(0)
            
-            self.set_info_text("Gana juego: player " + str(winner_juego + 1))
+            self.set_info_text("Player " + str(winner_juego + 1) + " wins 'Game'")
             
             # Check how many points
             if self.hands[winner_juego].get_value_juego() == 31:
@@ -305,7 +305,7 @@ class MusGame:
                 winner_punto = next_player        
             next_player += 1
             #print (winner_grande)
-        self.set_info_text("Gana punto: player " + str(winner_punto + 1))
+        self.set_info_text("Player " + str(winner_punto + 1) + " wins 'Point'")
         #You just get one point for winning punto
         self.increment_score(1, winner_punto % 2)
         #print (self)
@@ -373,7 +373,7 @@ class MusGame:
                 #print (players)
                 self.hands = [Hand(player, self._deck)
                               for player in players]            
-                self.set_mano_text("Mano is Player " + str(self.get_mano() + 1))        
+                self.set_mano_text("Starting player is Player " + str(self.get_mano() + 1))        
                 self.set_info_text("")
             #Status 1 -> Grande
             #There's no winner check:
@@ -933,7 +933,7 @@ def draw_handler(canvas):
     #"Mano" text on the top right corner
     canvas.draw_text(game.get_mano_text(),
                      (CANVAS_WIDTH - 300,
-                      50), TEXT_SIZE, 'Black')
+                      50), TEXT_SIZE / 1.5, 'Black')
     #Cards of each player
     player = 0
     for hand in game.get_hands():        
