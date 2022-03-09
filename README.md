@@ -1,7 +1,7 @@
 # Mus
 Mus cards game
 
-Mus is a very typical card game. Some people claim numerous university students spends longer in the cafeteria playing this game, than actually attending to lessons. That being true or false, the game has a high component of strategy.
+Mus is a very typical card game in Spain. It's supposed to have its origin in the Basque Country region, however its very well known in most areas of Spain, being some examples Navarra or Madrid. Some people claim numerous university students spend longer in the cafeteria playing this game, than actually attending to lessons. That being true or false, the game has a high component of strategy.
 
 Please read the Wikipedia reference for this game in order to understand it: https://en.wikipedia.org/wiki/Mus_(card_game)
 
