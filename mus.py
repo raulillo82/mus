@@ -23,13 +23,14 @@ POINTS_TO_WIN = 40
 
 #IMAGE
 #1040 x 492 pixels
+#Modified to 2496 x 1595
 
 CANVAS_WIDTH = 1000
 CANVAS_HEIGHT = 800
 CONTROL_PANEL_WIDTH = 85
-TEXT_HOR_MARGIN = 150
+TEXT_HOR_MARGIN = 100
 TEXT_BORDER_MARGIN = 10
-TEXT_SIZE = 30
+TEXT_SIZE = 20
 
 class MusGame:
     """
@@ -933,7 +934,7 @@ def draw_handler(canvas):
     #"Mano" text on the top right corner
     canvas.draw_text(game.get_mano_text(),
                      (CANVAS_WIDTH - 300,
-                      50), TEXT_SIZE / 1.5, 'Black')
+                      50), TEXT_SIZE, 'Black')
     #Cards of each player
     player = 0
     for hand in game.get_hands():        
@@ -980,15 +981,23 @@ print (nueva_mano.wins_grande(nueva_mano2))'''
 #Load the image
 cards_image = simplegui.load_image(
     #'https://drive.google.com/file/d/0B9mfaVCj5XQEUWdaanJNeHVpdm8')
+    #'https://upload.wikimedia.org/wikipedia/commons/e/e0/Baraja_espa%C3%B1ola_completa.png')
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Baraja_espa%C3%B1ola_completa.png/1280px-Baraja_espa%C3%B1ola_completa.png')
     #'https://docs.google.com/uc?export=download&id=0B9mfaVCj5XQEUWdaanJNeHVpdm8')
-    'http://nacho-martin.com/images/posts/naipes.png')
+    #'http://nacho-martin.com/images/posts/naipes.png')
     #'http://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Baraja_espa%C3%B1ola.svg/1280px-Baraja_espa%C3%B1ola.svg.png')
+    #'./spanish_deck.jpg')
 #Get width and height
+
+#cards_image = simplegui._load_local_image('images/spanish_deck.jpg')
+
 _image_width = cards_image.get_width()
 _image_height = cards_image.get_height()
+
+print (_image_width, _image_height)
 #Get card size in the tiled image
-card_width = _image_width / (len(NAMES) + 3)
-card_height = _image_height / len(SUITS)
+card_width = _image_width / (len(NAMES) + 2) #Image has 2 extra cards, 8 and 9, that are not used
+card_height = _image_height / (len(SUITS) + 1) #Image has 1 extra row, for the back of the card image
                       
 frame = simplegui.create_frame('Mus',
                                CANVAS_WIDTH,
