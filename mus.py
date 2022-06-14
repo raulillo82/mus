@@ -110,10 +110,10 @@ class MusGame:
         '''
         if self.score_pair_1() >= POINTS_TO_WIN:
             winner_pair = 0
-            #print "Player 1 and Player 3 win!!!"
+            #print ("Player 1 and Player 3 win!!!")
         elif self.score_pair_2() >= POINTS_TO_WIN:
             winner_pair = 1
-            #print "Player 2 and Player 4 win!!!"
+            #print ("Player 2 and Player 4 win!!!")
         else:
             winner_pair = -1
         return winner_pair
@@ -127,7 +127,7 @@ class MusGame:
         elif couple == 1:
             self._score_pair_2 += amount
         else:
-            print "Exception in increment score"
+            print ("Exception in increment score")
            
     def get_partner_id(self, partner):
         '''
@@ -148,10 +148,10 @@ class MusGame:
             if self.hands[winner_grande].wins_grande(self.hands[next_player]) == False:
                 winner_grande = next_player        
             next_player += 1
-            #print winner_grande
+            #print (winner_grande)
         self.set_info_text("Gana grande: player " + str(winner_grande + 1))
         self.increment_score(1, winner_grande % 2)
-        #print self
+        #print (self)
     
     def play_pequenya(self):
         '''
@@ -163,10 +163,10 @@ class MusGame:
             if self.hands[winner_pequenya].wins_pequenya(self.hands[next_player]) == False:
                 winner_pequenya = next_player        
             next_player += 1
-            #print winner_pequenya
+            #print (winner_pequenya)
         self.set_info_text("Gana pequenya: player " + str(winner_pequenya + 1))
         self.increment_score(1, winner_pequenya % 2)
-        #print self
+        #print (self)
     
     def play_pairs(self):
         '''
@@ -178,7 +178,7 @@ class MusGame:
             if self.hands[i].get_pairs() != []:
                 players_with_pairs.append(i)
     
-        #print players_with_pairs
+        #print (players_with_pairs)
         #If no one has pairs, don't play, display the text
         if (len(players_with_pairs) < 1):# or
             #(len(players_with_pairs) == 2 and
@@ -191,12 +191,12 @@ class MusGame:
                 winner_pairs = players_with_pairs.pop(0)
                 next_player = players_with_pairs.pop(0)
                 for i in range(len(players_with_pairs_iterable) - 1):
-                    #print winner_pairs, next_player
+                    #print (winner_pairs, next_player)
                     if self.hands[winner_pairs].wins_pares(self.hands[next_player]) == False:
                         winner_pairs = next_player
                     if players_with_pairs != []:
                         next_player = players_with_pairs.pop(0)
-                    #print winner_pairs
+                    #print (winner_pairs)
             #If only one player, he wins the pairs
             else:
                 winner_pairs = players_with_pairs.pop(0)
@@ -212,7 +212,7 @@ class MusGame:
                     len(self.hands[self.get_partner_id(winner_pairs)].get_pairs()) - 1,
                     winner_pairs % 2)
         
-        #print self
+        #print (self)
         
     def play_juego_punto (self):
         '''
@@ -236,13 +236,13 @@ class MusGame:
         
     
     def play_juego(self):
-        #print players_with_juego
+        #print (players_with_juego)
         players_with_juego = []
         for i in range(NUM_PLAYERS):
             if self.hands[i].has_juego():
                 players_with_juego.append(i)
                 
-        #print players_with_juego
+        #print (players_with_juego)
         
         #This if/else is no longer so useful
         #as we already check this in play_juego_punto
@@ -259,12 +259,12 @@ class MusGame:
                 next_player = players_with_juego.pop(0) 
             
                 for i in range(len(players_with_juego_iterable) - 1):
-                    #print winner_pairs, next_player
+                    #print (winner_pairs, next_player)
                     if self.hands[winner_juego].wins_juego(self.hands[next_player]) == False:
                         winner_juego = next_player
                     if players_with_juego != []:
                         next_player = players_with_juego.pop(0)
-                    #print winner_pairs
+                    #print (winner_pairs)
             # Only one player with juego, he wins
             else:
                 winner_juego = players_with_juego.pop(0)
@@ -289,9 +289,9 @@ class MusGame:
                 self.increment_score(points_partner, winner_juego % 2)
             
         #else:
-        #    print "No se juega el juego"
+        #    print ("No se juega el juego")
             
-        #print self
+        #print (self)
     
     def play_punto(self):
         winner_punto = 0        
@@ -303,11 +303,11 @@ class MusGame:
             if self.hands[winner_punto].wins_punto(self.hands[next_player]) == False:
                 winner_punto = next_player        
             next_player += 1
-            #print winner_grande
+            #print (winner_grande)
         self.set_info_text("Gana punto: player " + str(winner_punto + 1))
         #You just get one point for winning punto
         self.increment_score(1, winner_punto % 2)
-        #print self
+        #print (self)
         
     def play(self):
         '''
@@ -319,15 +319,15 @@ class MusGame:
         players = range(NUM_PLAYERS)
         self.set_mano(players[0])
         while self.winner() == -1:  
-            print players
+            print (players)
             #0 Hand out cards and set hand
             self.hands = [Hand(player, self._deck)
                           for player in players]            
-            print "Mano is Player " + str(self.get_mano() + 1)
+            print ("Mano is Player " + str(self.get_mano() + 1))
             #Print hands in the console
             for hand in self.hands:                
-                print hand
-                print hand.get_real_values()
+                print (hand)
+                print (hand.get_real_values())
                 
             #1 Play grande
             self.play_grande()
@@ -340,7 +340,7 @@ class MusGame:
             #4 Play juego or punto (if no winner yet)
             if self.winner() == -1:
                 self.play_juego_punto()
-            print ""
+            print ("")
             
             #Change mano
             players.insert(0, players.pop())
@@ -350,9 +350,9 @@ class MusGame:
             
         winner = self.winner()
         if winner == 0:
-            print "Player 1 and Player 3 win!!!"
+            print ("Player 1 and Player 3 win!!!")
         else:
-            print "Player 2 and Player 4 win!!!"
+            print ("Player 2 and Player 4 win!!!")
             
     def play_step(self):
         '''
@@ -369,7 +369,7 @@ class MusGame:
                 mano = self.get_mano()
                 players = [(NUM_PLAYERS - mano + idx) % NUM_PLAYERS
                            for idx in range(NUM_PLAYERS)]
-                #print players                
+                #print (players)
                 self.hands = [Hand(player, self._deck)
                               for player in players]            
                 self.set_mano_text("Mano is Player " + str(self.get_mano() + 1))        
@@ -391,7 +391,7 @@ class MusGame:
             elif self.get_status() == 4:
                 if self.winner() == -1:
                     self.play_juego_punto()
-                print ""
+                print ("")
                 winner = self.winner()
                 #Change mano
                 #players.insert(0, players.pop())
@@ -628,7 +628,7 @@ class Hand:
                 wins = True
             else:
                 wins = False
-        #print wins
+        #print (wins)
         return wins
     
     def wins_pequenya(self, hand):
@@ -671,7 +671,7 @@ class Hand:
                 wins = True
             else:
                 wins = False
-        #print wins
+        #print (wins)
         return wins
     
     def get_pairs(self):
@@ -710,7 +710,7 @@ class Hand:
         wins = None
         own_pairs = self.get_pairs()
         other_pairs = hand.get_pairs()
-        #print own_pairs, other_pairs
+        #print (own_pairs, other_pairs)
         
         #Don't check if anybody has no pairs
         if len(own_pairs) > 0 and len(other_pairs) > 0:
@@ -759,7 +759,7 @@ class Hand:
         '''
         wins = None
                        
-        #print juego_own, juego_other
+        #print (juego_own, juego_other)
         juego_own = self.get_value_juego()
         juego_other = hand.get_value_juego()
         
@@ -783,8 +783,8 @@ class Hand:
         '''for card_own, card_other in self._cards, hand._cards:
             juego_own += card_own.get_value_juego()
             juego_other += card_other.get_value_juego()
-            print juego_own, juego_other
-        print juego_own, juego_other
+            print (juego_own, juego_other)
+        print (juego_own, juego_other)
         '''
         return wins
     
@@ -820,17 +820,17 @@ def new_game ():
     #deck = Deck()
     #hands = [Hand(player, deck) for player in range(NUM_PLAYERS)]
     '''for hand in range(1, NUM_PLAYERS):
-        print hands[0]
-        print hands[hand]
-        print hands[0].wins_juego(hands[hand])'''
+        print (hands[0])
+        print (hands[hand])
+        print (hands[0].wins_juego(hands[hand]))'''
         
     '''for hand in range(1, NUM_PLAYERS):
-        print hands[0]
-        print hands[hand]
-        print hands[0].wins_pares(hands[hand])'''
+        print (hands[0])
+        print (hands[hand])
+        print (hands[0].wins_pares(hands[hand]))'''
     #hands[0].exchange_cards(0, 1)
-    #print hands[0]
-    #print ""
+    #print (hands[0])
+    #print ("")
     '''
     card1 = Card(1, "oros")
     card2 = Card(2, "oros")
@@ -847,30 +847,30 @@ def new_game ():
     
     '''
     for hand in hands:
-        print hand
-        print hand.get_real_values()
+        print (hand)
+        print (hand.get_real_values())
     '''
     
     
     '''
     for i in range(1, NUM_PLAYERS):
     #for i in range(1, len(hands)):
-        print hands[0]
-        print "Contra " + str(i+1)
-        print hands[i]
+        print (hands[0])
+        print ("Contra " + str(i+1))
+        print (hands[i])
         
-        print "Gana grande?"
-        print hands[0].get_real_values()
-        print hands[i].get_real_values()
+        print ("Gana grande?")
+        print (hands[0].get_real_values())
+        print (hands[i].get_real_values())
         hands[0].wins_grande(hands[i])
-        print "Gana pequenya?"        
+        print ("Gana pequenya?")
         hands[0].wins_pequenya(hands[i])
-        print "Gana pares?"
-        print hands[0].wins_pares(hands[i])
-        print "Gana juego?"
-        print hands[0].wins_juego(hands[i])
+        print ("Gana pares?")
+        print (hands[0].wins_pares(hands[i]))
+        print ("Gana juego?")
+        print (hands[0].wins_juego(hands[i]))
         
-        print ""
+        print ("")
      '''
     partida = MusGame()
     partida.play_step()
@@ -974,7 +974,7 @@ nueva_mano = Hand(1, new_deck,
 nueva_mano2 = Hand(0, new_deck,
                   [new_card, new_card, new_card, new_card])
 
-print nueva_mano.wins_grande(nueva_mano2)'''
+print (nueva_mano.wins_grande(nueva_mano2))'''
 
 #Load the image
 cards_image = simplegui.load_image(
