@@ -153,7 +153,7 @@ class Hand:
             wins = False
         else:
             wins = True
-        print wins
+        print (wins)
         return wins
     
     def wins_pequenya(self, hand):
@@ -179,7 +179,7 @@ class Hand:
             wins = False
         else:
             wins = True
-        print wins
+        print (wins)
         self.sort()
         hand.sort()
         return wins
@@ -195,9 +195,9 @@ def new_game ():
     deck = Deck()
     hands = [Hand(deck) for player in range(NUM_PLAYERS)]
     for hand in hands:
-        print hand
+        print (hand)
     #hands[0].exchange_cards(0, 1)
-    #print hands[0]
+    #print (hands[0])
     #print ""
     card1 = Card(1, "oros")
     card2 = Card(1, "oros")
@@ -210,13 +210,13 @@ def new_game ():
     hand1.wins_pequenya(hand2)
 
     for i in range(1, NUM_PLAYERS):
-        print "Contra " + str(i+1)
-        print "Gana grande?"
-        print hands[0].get_real_values()
-        print hands[i].get_real_values()
+        print ("Contra " + str(i+1))
+        print ("Gana grande?")
+        print (hands[0].get_real_values())
+        print (hands[i].get_real_values())
         hands[0].wins_grande(hands[i])
-        print "Gana pequenya?"        
+        print ("Gana pequenya?")
         hands[0].wins_pequenya(hands[i])
-        print ""
+        print ("")
     
 new_game()
