@@ -2,6 +2,7 @@
 Mus
 """
 import random
+import os
 
 try:
     import simplegui
@@ -13,13 +14,22 @@ VALUES = tuple(range(1, 11))
 SUITS = ("oros", "copas", "espadas", "bastos")
 NAMES = {1: "as", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7",
          8: "sota", 9: "caballo", 10: "rey"}
+#Indexes within the array for each game
+GAMES_INDEX = {"Grande": 0, "Pequenya": 1, "Pares": 2, "Juego_punto": 3}
 CARDS_PER_HAND = 4
 NUM_PLAYERS = 4
+NUM_COUPLES = 2
+#Mus has 4 games in the same game
+GAMES_IN_MUS = 4
 NO_PAIRS = 0
 PAIR = 1
 THREE_OF_A_KIND = 2
 DOUBLE_PAIR = 3
 POINTS_TO_WIN = 40
+#Default amount to bet, also called "envite", this is always 2 as a standard
+DEFAULT_BET = 2
+#Amount to win when nobody bets
+PASS_AMOUNT = 1
 
 #IMAGE
 #1040 x 492 pixels
@@ -41,24 +51,31 @@ class MusGame:
         Initializator
         """
         #Scores of both pairs
-        self._score_pair_1 = 0
-        self._score_pair_2 = 0
+        self._score_couple_1 = 0
+        self._score_couple_2 = 0
         #A deck is needed for the game
         self._deck = Deck()
         #int to know if there's already a winner
-        #values: -1 no winner, 0 pair 1, 1 pair 2
+        #values: -1 no winner, 0 couple 1, 1 couple 2
         self._winner = -1
         #Mano, player who wins in case of a tie
         self._mano = 0
+        #Whose turn it is, at the beginning, it's "mano's" turn
+        self._turn = self._mano
+        #Amounts bet at each of the games, initialized to 0
+        self.reset_bets()
+        #Was each of the games played?
+        self.reset_game_played()
         #Each player has a hand of 4 cards
         self.hands = [Hand(player, self._deck)
                       for player in range(NUM_PLAYERS)]
         #Status
-        #0 After handing out cards
-        #1 After playing grande
-        #2 After playing pequenya
-        #3 After playing pairs
-        #4 After playing juego/punto
+        #0 After handing out cards (or between games 1 to 4)
+        #1 playing grande
+        #2 playing pequenya
+        #3 playing pairs
+        #4 playing juego/punto
+        #5 counting points
         self._status = 0
         #Text to be displayed in the middle of the canvas
         self._info_text = ""
@@ -70,22 +87,30 @@ class MusGame:
         """
         Human readable representation of the game
         """
-        string = "Player 1 and Player 3: " + str(self.score_pair_1())
+        string = "Player 1 and Player 3: " + str(self.score_couple_1())
         string += '\n'
-        string += "Player 2 and Player 4: " + str(self.score_pair_2())
+        string += "Player 2 and Player 4: " + str(self.score_couple_2())
         return string    
        
-    def score_pair_1(self):
-        return self._score_pair_1
+    def score_couple_1(self):
+        return self._score_couple_1
     
-    def score_pair_2(self):
-        return self._score_pair_2
+    def score_couple_2(self):
+        return self._score_couple_2
     
     def set_mano(self, player):
         self._mano = player
+        #Also change turn
+        self._turn = player
         
     def get_mano(self):
         return self._mano
+    
+    def set_turn(self, player):
+        self._turn = player
+        
+    def get_turn(self):
+        return self._turn
     
     def get_status(self):
         return self._status
@@ -99,6 +124,28 @@ class MusGame:
     def set_info_text(self, info_text):
         self._info_text = info_text
         
+    def append_info_text(self, info_text):
+        self._info_text += info_text
+
+    def get_bet(self, game):
+        return self._bets[game]
+
+    def set_bet(self, amount, game):
+        #Array index will be the status - 1
+        self._bets[game] = amount
+
+    def reset_bets(self):
+        self._bets = [0 for bet in range(GAMES_IN_MUS)]
+
+    def get_game_played(self, game):
+        return self._game_played[game]
+
+    def toggle_game_played(self, game):
+        self._game_played[game] = not(self._game_played[game])
+
+    def reset_game_played(self):
+        self._game_played = [False for bet in range(GAMES_IN_MUS)]
+
     def get_mano_text(self):
         return self._mano_text
     
@@ -107,27 +154,27 @@ class MusGame:
     
     def winner(self):
         '''
-        Method to check if any of the pairs
+        Method to check if any of the copules
         has reached the score limit to win
         '''
-        if self.score_pair_1() >= POINTS_TO_WIN:
-            winner_pair = 0
+        if self.score_couple_1() >= POINTS_TO_WIN:
+            winner_couple = 0
             #print ("Player 1 and Player 3 win!!!")
-        elif self.score_pair_2() >= POINTS_TO_WIN:
-            winner_pair = 1
+        elif self.score_couple_2() >= POINTS_TO_WIN:
+            winner_couple = 1
             #print ("Player 2 and Player 4 win!!!")
         else:
-            winner_pair = -1
-        return winner_pair
+            winner_couple = -1
+        return winner_couple
     
     def increment_score(self, amount, couple):
         '''
-        Method to increment the score of a pair
+        Method to increment the score of a couple
         '''
         if couple == 0:
-            self._score_pair_1 += amount
+            self._score_couple_1 += amount
         elif couple == 1:
-            self._score_pair_2 += amount
+            self._score_couple_2 += amount
         else:
             print ("Exception in increment score")
            
@@ -139,11 +186,20 @@ class MusGame:
     
     def get_hands(self):
         return self.hands
-        
-    def play_grande(self):
+
+    def manage_bets (self):
+        #Show whose turn it is:
+        self.set_info_text("Player's " + str(self.get_turn() + 1) + " turn")
+
+        #Show the buttons (bet, pass)
+        button2.set_text ("Bet")
+        button3.set_text ("Pass")
+
+    def compute_grande(self):
         '''
         Method to play the first of the four games, grande
         '''
+        #Logic to check the winner
         winner_grande = 0
         next_player = winner_grande + 1
         for i in range(1, NUM_PLAYERS):        
@@ -152,10 +208,13 @@ class MusGame:
             next_player += 1
             #print (winner_grande)
         self.set_info_text("Player " + str(winner_grande + 1) + " wins 'Biggest'")
-        self.increment_score(1, winner_grande % 2)
+        #If nothing was bet, whoever wins take one point
+        if self.get_bet(GAMES_INDEX.get("Grande")) == 0:
+            self.set_bet(PASS_AMOUNT, GAMES_INDEX.get("Grande"))
+        self.increment_score(self.get_bet(GAMES_INDEX.get("Grande")), winner_grande % 2)
         #print (self)
     
-    def play_pequenya(self):
+    def compute_pequenya(self):
         '''
         Method to play the 2nd of the four games, pequenya
         '''
@@ -166,8 +225,14 @@ class MusGame:
                 winner_pequenya = next_player        
             next_player += 1
             #print (winner_pequenya)
-        self.set_info_text("Player " + str(winner_pequenya + 1) + " wins 'Smallest'")
-        self.increment_score(1, winner_pequenya % 2)
+        #Only previous texts with info about Grande have to be kept
+        if "Biggest" not in self.get_info_text():
+            self.set_info_text ("")
+        self.append_info_text("Player " + str(winner_pequenya + 1) + " wins 'Smallest'")
+        #If nothing was bet, whoever wins take one point
+        if self.get_bet(GAMES_INDEX.get("Pequenya")) == 0:
+            self.set_bet(PASS_AMOUNT, GAMES_INDEX.get("Pequenya"))
+        self.increment_score(self.get_bet(GAMES_INDEX.get("Pequenya")), winner_pequenya % 2)
         #print (self)
     
     def play_pairs(self):
@@ -185,7 +250,7 @@ class MusGame:
         if (len(players_with_pairs) < 1):# or
             #(len(players_with_pairs) == 2 and
              #players_with_pairs[1] - players_with_pairs[0] != 2)):
-            self.set_info_text("Nobody has 'pairs'")
+            self.append_info_text("Nobody has 'pairs'")
         else:
             #Only play for more than 1 player
             if (len(players_with_pairs) > 1):
@@ -376,31 +441,49 @@ class MusGame:
                               for player in players]            
                 self.set_mano_text("Starting player is Player " + str(self.get_mano() + 1))        
                 self.set_info_text("")
+                #Reset bets and the status of each game played
+                self.reset_bets()
+                self.reset_game_played()
             #Status 1 -> Grande
             #There's no winner check:
             #no one can win between dealing and grande so far
             elif self.get_status() == 1:
-                self.play_grande()
+                ##Logic to manage the bets
+                self.manage_bets()
+
             #Status 2 -> Pequenya
             elif self.get_status() == 2:
                 if self.winner() == -1:
-                    self.play_pequenya()
+                    ##Logic to manage the bets
+                    self.manage_bets()
+
             #Status 3 -> Pares
             elif self.get_status() == 3:
                 if self.winner() == -1:
                     self.play_pairs()
+                    
             #Status 4 -> Juego/punto
             elif self.get_status() == 4:
                 if self.winner() == -1:
                     self.play_juego_punto()
-                print ("")
+                #print ("")
                 winner = self.winner()
+            #Status 5 -> Counting points
+            elif self.get_status() == 5:
+                if not(self.get_game_played(GAMES_INDEX.get("Grande"))):
+                    self.compute_grande()
+                #Check that after computing grande, nobody has won yet
+                if self.winner() == -1:
+                    if not(self.get_game_played(GAMES_INDEX.get("Pequenya"))):
+                        self.compute_pequenya()
                 #Change mano
                 #players.insert(0, players.pop())
                 self.set_mano((self.get_mano() + 1) % 4)
                 #Get a new deck and shuffle
                 self._deck = Deck()
-        #Check for winners after juego/punto
+                winner = self.winner()
+
+        #Check for winners
         elif self.winner() == 0:
             self.set_info_text("Player 1 and Player 3 win!!!")
         elif self.winner() == 1:
@@ -880,16 +963,74 @@ def new_game ():
     
 #new_game()
 def new_button_handler():
+    #Reset button names
+    button2.set_text('Next')
+    button3.set_text('')
     global game
     game = new_game()    
     
-def next_button_handler():
-    status = game.get_status()
-    status += 1
-    status %= 5
-    game.set_status(status)
-    game.play_step()
+def button2_handler():
+    if button2.get_text() == "Next":
+        status = game.get_status()
+        status += 1
+        status %= 6
+        game.set_status(status)
+        game.play_step()
+    elif button2.get_text() == "Bet":
+        #Place the bet
+        game.set_bet(DEFAULT_BET, game.get_status() - 1)
+        #Change turn to next player to call or pass
+        game.set_turn((game.get_turn() + 1 ) % NUM_PLAYERS)
+        #print(game.get_bet(game.get_status() - 1))
+        game.set_info_text(str(game.get_bet(game.get_status() - 1)) + " were bet. Player's " + str(game.get_turn() + 1) + " turn")
+        #Change button 2 text to "call"
+        button2.set_text("Call")
+        #Enable button 3 text to "pass"
+        button3.set_text("Pass")
+        #Change text to show next player's turn
+    elif button2.get_text() == "Call":
+        #Bet was closed, will be checked at the end of the game
+        #Change turn back to mano
+        game.set_turn(game.get_mano())
+        #Change buttons text to default
+        button2.set_text("Next")
+        button3.set_text("")
+        #Change text to reset player's turn
+        game.set_info_text("Bet was called. Player's " + str(game.get_turn() + 1) + " turn")
     
+def button3_handler():
+    if button3.get_text() == "Pass":
+        #Check whether there was a previous bet
+        if game.get_bet(game.get_status() - 1) > 0:
+            #There was a bet, "pass" means "reject the bet"
+            #Mark game as played. 
+            game.toggle_game_played(game.get_status() - 1)
+            #Increase score. Whose score? Couple whose turn is not active
+            game.increment_score(1, (game.get_turn() + 1) % NUM_COUPLES)
+            #Change turn back to mano
+            game.set_turn(game.get_mano())
+            #Change buttons text to default
+            button2.set_text("Next")
+            button3.set_text("")
+            #Change text to reset player's turn
+            game.set_info_text("Player's " + str(game.get_turn() + 1) + " turn")
+        #There was no bet rejection, so next player can bet if they want
+        elif game.get_bet(game.get_status() - 1) == 0:
+            #Change turn to next player
+            game.set_turn((game.get_turn() + 1 ) % NUM_PLAYERS)
+            #If the turn was already changed 3 times, it's a full round, go to the next game
+            if game.get_turn() == game.get_mano():
+                #Change buttons text to default
+                button2.set_text("Next")
+                button3.set_text("")
+                #Change text to inform game was not played. Reset player's turn
+                #print ((GAMES_INDEX.keys())[0])
+                game.set_info_text(list(GAMES_INDEX.keys())[game.get_status() - 1] + " was not played. Player's " + str(game.get_turn() + 1) + " turn")
+            #Otherwise, simply switch the turn to the next player
+            else:
+                #Change text to reset player's turn
+                game.set_info_text("Player's " + str(game.get_turn() + 1) + " turn")
+
 def draw_handler(canvas):    
     '''canvas.draw_image(cards_image,
                       #(IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2),
@@ -916,9 +1057,9 @@ def draw_handler(canvas):
                       CANVAS_HEIGHT / 2),
                      TEXT_SIZE, 'Black')
     #Scores
-    canvas.draw_text('Player 1 & Player 3: ' + str(game.score_pair_1()),
+    canvas.draw_text('Player 1 & Player 3: ' + str(game.score_couple_1()),
                      (5, 25), TEXT_SIZE, 'Black')
-    canvas.draw_text('Player 2 & Player 4: ' + str(game.score_pair_2()),
+    canvas.draw_text('Player 2 & Player 4: ' + str(game.score_couple_2()),
                      (5, 50), TEXT_SIZE, 'Black')
     '''canvas.draw_image(cards_image,
                       (card_width * (0.5 + 3),
@@ -994,7 +1135,7 @@ cards_image = simplegui.load_image(
 _image_width = cards_image.get_width()
 _image_height = cards_image.get_height()
 
-print (_image_width, _image_height)
+#print (_image_width, _image_height)
 #Get card size in the tiled image
 card_width = _image_width / (len(NAMES) + 2) #Image has 2 extra cards, 8 and 9, that are not used
 card_height = _image_height / (len(SUITS) + 1) #Image has 1 extra row, for the back of the card image
@@ -1004,10 +1145,15 @@ frame = simplegui.create_frame('Mus',
                                CANVAS_HEIGHT,
                                CONTROL_PANEL_WIDTH)
 frame.set_canvas_background('Blue')
+#Button to start a new game at any point of time
 button1 = frame.add_button('New game',
                            new_button_handler)
+#This button will be mainly used to go to the next step. However, it can be also used to bet
 button2 = frame.add_button('Next',
-                           next_button_handler)
+                           button2_handler)
+#This button has no function at the beginning, will show a text to pass when needed
+button3 = frame.add_button('',
+                           button3_handler)
 frame.set_draw_handler(draw_handler)
 game = new_game()
 frame.start()
