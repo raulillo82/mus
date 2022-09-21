@@ -1157,3 +1157,4 @@ button3 = frame.add_button('',
 frame.set_draw_handler(draw_handler)
 game = new_game()
 frame.start()
+#This is a new comment
